@@ -27,7 +27,7 @@ let init_ backend =
   maybe_py_init ();
   let mpl = Py.import "matplotlib" in
   Option.iter (Backend.to_string_option backend) ~f:(fun backend_str ->
-      ignore ((mpl.&("use")) [| Py.String.of_string backend_str |]));
+      ignore (mpl.&("use") [| Py.String.of_string backend_str |]));
   Py.import "matplotlib.pyplot"
 
 let set_backend backend =
@@ -99,7 +99,8 @@ module Loc = struct
     | Center
 
   let to_pyobject t =
-    let str = match t with
+    let str =
+      match t with
       | Best -> "best"
       | UpperRight -> "upper right"
       | UpperLeft -> "upper left"
@@ -111,12 +112,13 @@ module Loc = struct
       | LowerCenter -> "lower center"
       | UpperCenter -> "upper center"
       | Center -> "center"
-    in Py.String.of_string str
+    in
+    Py.String.of_string str
 end
 
 let savefig filename =
   let p = pyplot_module () in
-  ignore ((p.&("savefig")) [| Py.String.of_string filename |])
+  ignore (p.&("savefig") [| Py.String.of_string filename |])
 
 let plot_data format =
   let p = pyplot_module () in
@@ -126,7 +128,7 @@ let plot_data format =
     | `jpg -> "jpg"
   in
   let io = Py.import "io" in
-  let bytes_io = (io.&("BytesIO")) [||] in
+  let bytes_io = io.&("BytesIO") [||] in
   let _ =
     Py.Module.get_function_with_keywords
       p
@@ -134,19 +136,19 @@ let plot_data format =
       [| bytes_io |]
       [ "format", Py.String.of_string format ]
   in
-  (bytes_io.&("getvalue")) [||] |> Py.String.to_string
+  bytes_io.&("getvalue") [||] |> Py.String.to_string
 
 let show () =
   let p = pyplot_module () in
-  ignore ((p.&("show")) [||])
+  ignore (p.&("show") [||])
 
 let style_available () =
   let p = pyplot_module () in
-  (p.@$("style")).@$("available") |> Py.List.to_list_map Py.String.to_string
+  p.@$("style").@$("available") |> Py.List.to_list_map Py.String.to_string
 
 let style_use s =
   let p = pyplot_module () in
-  ignore (((p.@$("style")).&("use")) [| Py.String.of_string s |])
+  ignore (p.@$("style").&("use") [| Py.String.of_string s |])
 
 module Public = struct
   module Backend = Backend
@@ -178,11 +180,12 @@ let call_plot_func p func ?label ?color ?linewidth ?linestyle ?xs ys =
     | Some xs -> [| float_array_to_python xs; float_array_to_python ys |]
     | None -> [| float_array_to_python ys |]
   in
-  let func_name = match func with
-  | `plot -> "plot"
-  | `semilogy -> "semilogy"
-  | `semilogx -> "semilogx"
-  | `loglog -> "loglog"
+  let func_name =
+    match func with
+    | `plot -> "plot"
+    | `semilogy -> "semilogy"
+    | `semilogx -> "semilogx"
+    | `loglog -> "loglog"
   in
   ignore (Py.Module.get_function_with_keywords p func_name args keywords)
 
@@ -199,12 +202,13 @@ let loglog p ?label ?color ?linewidth ?linestyle ?xs ys =
   call_plot_func p `loglog ?label ?color ?linewidth ?linestyle ?xs ys
 
 let fill_between p ?color ?alpha xs ys1 ys2 =
-  let keywords = List.filter_opt
-    [ Option.map color ~f:(fun color -> "color", Color.to_pyobject color)
-    ; Option.map alpha ~f:(fun alpha -> "alpha", Py.Float.of_float alpha)
-    ]
+  let keywords =
+    List.filter_opt
+      [ Option.map color ~f:(fun color -> "color", Color.to_pyobject color)
+      ; Option.map alpha ~f:(fun alpha -> "alpha", Py.Float.of_float alpha)
+      ]
   in
-  let args = Array.map [|xs; ys1; ys2|] float_array_to_python in
+  let args = Array.map [| xs; ys1; ys2 |] float_array_to_python in
   ignore (Py.Module.get_function_with_keywords p "fill_between" args keywords)
 
 let hist p ?label ?color ?bins ?orientation ?histtype ?xs ys =
@@ -252,6 +256,13 @@ let scatter p ?s ?c ?marker ?alpha ?linewidths xys =
   let ys = Py.List.of_array_map (fun (_, y) -> Py.Float.of_float y) xys in
   ignore (Py.Module.get_function_with_keywords p "scatter" [| xs; ys |] keywords)
 
+let annotate p text x y =
+  let text = Py.String.of_string text in
+  let x = Py.Float.of_float x in
+  let y = Py.Float.of_float y in
+  let xy = Py.Tuple.of_pair (x, y) in
+  ignore (Py.Module.get_function p "annotate" [| text; xy |])
+
 let scatter_3d p ?s ?c ?marker ?alpha ?linewidths xyzs =
   let keywords =
     List.filter_opt
@@ -289,8 +300,7 @@ module Imshow_data = struct
   let to_pyobject (P (data, typ_)) =
     let to_pyobject ~scalar_to_pyobject =
       match data with
-      | Scalar data ->
-        Py.List.of_array_map (Py.List.of_array_map scalar_to_pyobject) data
+      | Scalar data -> Py.List.of_array_map (Py.List.of_array_map scalar_to_pyobject) data
       | Rgb data ->
         let rgb_to_pyobject (r, g, b) =
           (scalar_to_pyobject r, scalar_to_pyobject g, scalar_to_pyobject b)
@@ -320,9 +330,11 @@ let imshow p ?cmap data =
   ignore (Py.Module.get_function_with_keywords p "imshow" [| data |] keywords)
 
 let legend p ?labels ?loc () =
-  let keywords = List.filter_opt
-    [ Option.map labels ~f:(fun labels -> "labels",
-       Py.List.of_array_map Py.String.of_string labels)
-    ; Option.map loc ~f:(fun loc -> "loc", Loc.to_pyobject loc)
-    ] in
+  let keywords =
+    List.filter_opt
+      [ Option.map labels ~f:(fun labels ->
+            "labels", Py.List.of_array_map Py.String.of_string labels)
+      ; Option.map loc ~f:(fun loc -> "loc", Loc.to_pyobject loc)
+      ]
+  in
   ignore (Py.Module.get_function_with_keywords p "legend" [||] keywords)

@@ -15,8 +15,7 @@ module Ax : sig
     -> bool
     -> unit
 
-  val legend
-    :  t -> ?labels:string array -> ?loc:Mpl.Loc.t -> unit -> unit
+  val legend : t -> ?labels:string array -> ?loc:Mpl.Loc.t -> unit -> unit
 
   val plot
     :  t
@@ -42,8 +41,9 @@ module Ax : sig
   val scatter
     :  t
     -> ?s:float
-    -> ?c:Mpl.Color.t
-          (* Possible markers:
+    -> ?c:
+         Mpl.Color.t
+         (* Possible markers:
        'o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X'
     *)
     -> ?marker:char
@@ -52,6 +52,7 @@ module Ax : sig
     -> (float * float) array
     -> unit
 
+  val annotate : t -> string -> float -> float -> unit
   val imshow : t -> ?cmap:string -> Mpl.Imshow_data.t -> unit
 
   module Expert : sig

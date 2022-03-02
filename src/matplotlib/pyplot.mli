@@ -42,7 +42,7 @@ val loglog
   -> unit
 
 val fill_between
-  : ?color:Mpl.Color.t
+  :  ?color:Mpl.Color.t
   -> ?alpha:float
   -> float array
   -> float array
@@ -61,8 +61,9 @@ val hist
 
 val scatter
   :  ?s:float
-  -> ?c:Mpl.Color.t
-        (* Possible markers:
+  -> ?c:
+       Mpl.Color.t
+       (* Possible markers:
      'o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X'
   *)
   -> ?marker:char
@@ -72,5 +73,4 @@ val scatter
   -> unit
 
 val imshow : ?cmap:string -> Mpl.Imshow_data.t -> unit
-
-val legend : ?labels:(string array) -> ?loc:Mpl.Loc.t -> unit -> unit
+val legend : ?labels:string array -> ?loc:Mpl.Loc.t -> unit -> unit

@@ -4,16 +4,16 @@ open Pyops
 module Ax = struct
   type t = Py.Object.t
 
-  let set_title t title = ignore ((t.&("set_title")) [| Py.String.of_string title |])
+  let set_title t title = ignore (t.&("set_title") [| Py.String.of_string title |])
 
   let set_xlim t ~left ~right =
-    ignore ((t.&("set_xlim")) [| Py.Float.of_float left; Py.Float.of_float right |])
+    ignore (t.&("set_xlim") [| Py.Float.of_float left; Py.Float.of_float right |])
 
   let set_ylim t ~bottom ~top =
-    ignore ((t.&("set_ylim")) [| Py.Float.of_float bottom; Py.Float.of_float top |])
+    ignore (t.&("set_ylim") [| Py.Float.of_float bottom; Py.Float.of_float top |])
 
-  let set_xlabel t label = ignore ((t.&("set_xlabel")) [| Py.String.of_string label |])
-  let set_ylabel t label = ignore ((t.&("set_ylabel")) [| Py.String.of_string label |])
+  let set_xlabel t label = ignore (t.&("set_xlabel") [| Py.String.of_string label |])
+  let set_ylabel t label = ignore (t.&("set_ylabel") [| Py.String.of_string label |])
 
   let set_aspect t ~aspect =
     let aspect =
@@ -22,7 +22,7 @@ module Ax = struct
       | `equal -> Py.String.of_string "equal"
       | `f f -> Py.Float.of_float f
     in
-    ignore ((t.&("set_aspect")) [| aspect |])
+    ignore (t.&("set_aspect") [| aspect |])
 
   let grid t ?which ?axis b =
     let keywords =
@@ -56,6 +56,7 @@ module Ax = struct
   let scatter = Mpl.scatter
   let imshow = Mpl.imshow
   let legend = Mpl.legend
+  let annotate = Mpl.annotate
 
   module Expert = struct
     let to_pyobject = Fn.id
@@ -72,9 +73,9 @@ module Ax3d = struct
   let set_ylabel = Ax.set_ylabel
 
   let set_zlim t ~bottom ~top =
-    ignore ((t.&("set_zlim")) [| Py.Float.of_float bottom; Py.Float.of_float top |])
+    ignore (t.&("set_zlim") [| Py.Float.of_float bottom; Py.Float.of_float top |])
 
-  let set_zlabel t label = ignore ((t.&("set_zlabel")) [| Py.String.of_string label |])
+  let set_zlabel t label = ignore (t.&("set_zlabel") [| Py.String.of_string label |])
 
   let grid t b =
     let keywords = [ "b", Py.Bool.of_bool b ] in
@@ -128,7 +129,7 @@ module Fig = struct
     let ax2 = add_subplot t ~nrows ~ncols ~index:2 in
     t, ax1, ax2
 
-  let suptitle t title = ignore ((t.&("suptitle")) [| Py.String.of_string title |])
+  let suptitle t title = ignore (t.&("suptitle") [| Py.String.of_string title |])
 
   module Expert = struct
     let to_pyobject = Fn.id

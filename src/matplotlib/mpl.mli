@@ -45,7 +45,6 @@ module Loc : sig
   val to_pyobject : t -> Py.Object.t
 end
 
-
 (* [set_backend] has to be called before any other operation. *)
 val set_backend : Backend.t -> unit
 val pyplot_module : unit -> Py.Object.t
@@ -146,7 +145,7 @@ val loglog
   -> unit
 
 val fill_between
-  : Py.Object.t
+  :  Py.Object.t
   -> ?color:Color.t
   -> ?alpha:float
   -> float array
@@ -165,11 +164,14 @@ val hist
   -> float array
   -> unit
 
+val annotate : Py.Object.t -> string -> float -> float -> unit
+
 val scatter
   :  Py.Object.t
   -> ?s:float
-  -> ?c:Color.t
-        (* Possible markers:
+  -> ?c:
+       Color.t
+       (* Possible markers:
      'o', 'v', '^', '<', '>', '8', 's', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X'
   *)
   -> ?marker:char
@@ -200,10 +202,4 @@ module Imshow_data : sig
 end
 
 val imshow : Py.Object.t -> ?cmap:string -> Imshow_data.t -> unit
-
-val legend
-  : Py.Object.t
-  -> ?labels:string array
-  -> ?loc:Loc.t
-  -> unit
-  -> unit
+val legend : Py.Object.t -> ?labels:string array -> ?loc:Loc.t -> unit -> unit
